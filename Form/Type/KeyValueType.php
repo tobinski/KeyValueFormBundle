@@ -25,19 +25,28 @@ class KeyValueType extends AbstractType
             }
 
             $output = array();
+            function genOutput($input, $parentKey = '')
+            {
+                $output = [];
+                foreach ($input as $key => $value) {
+                    if (is_array($value)) {
+                        array_push($output,genOutput($value, $key));
+                    }
 
-            foreach ($input as $key => $value) {
-                $output[] = array(
-                    'key' => $key,
-                    'value' => $value
-                );
+                    $output[] = array(
+                        'key' => $parentKey !== '' ? $parentKey : $key,
+                        'value' => $value
+                    );
+                }
+                return $output;
             }
+            $output = genOutput($input);
 
             $e->setData($output);
         }, 1);
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolerInterface $resolver)
     {
         $this->configureOptions($resolver);
     }
